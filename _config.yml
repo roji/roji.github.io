@@ -1,9 +1,8 @@
 # Site wide configuration
 
-title:            Site Title
+title:            Shay Rojansky
 locale:           en_US
-url:              http://localhost:4000
-
+url:              http://www.roji.org
 
 # Jekyll configuration
 
@@ -26,21 +25,21 @@ kramdown:
 
 # Site owner
 owner:
-  name: Your Name
+  name: Shay Rojansky
   avatar: bio-photo.jpg
-  bio: "Describe your self."
+  bio: "Just another tech guy out there in the wild."
   email: 
   disqus-shortname: 
   twitter: #username
   facebook: #username
   google:
     plus: #username
-    analytics: 
+    analytics: UA-54744737-1
     verify: 
     ad-client: 
     ad-slot: 
   bing-verify: 
-  github: #username
+  github: roji
   stackoverflow: #http://stackoverflow.com/users/123456/username
   linkedin: #username
   instagram: #username
