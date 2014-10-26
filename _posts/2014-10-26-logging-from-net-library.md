@@ -5,10 +5,6 @@ excerpt: "One developer's adventures trying to sanely log from a third-party .NE
 modified: 2014-10-26
 #tags: [intro, beginner, jekyll, tutorial]
 comments: true
-image:
-  feature: texture-feature-02.jpg
-  credit: Texture Lovers
-  creditlink: http://texturelovers.com
 ---
 
 ## The Problem
