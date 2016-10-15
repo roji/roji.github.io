@@ -1,7 +1,6 @@
 ---
 layout: post
 title: Roslyn and Aspect-Oriented Programming
-excerpt: "One developer's adventures trying to sanely log from a third-party .NET library"
 modified: 2014-11-27
 comments: true
 ---
