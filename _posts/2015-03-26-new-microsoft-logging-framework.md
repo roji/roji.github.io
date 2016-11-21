@@ -4,7 +4,7 @@ modified: 2015-03-26
 comments: true
 ---
 
-Since [the last time I wrote about blogging]({% post_url 2014-10-26-logging-from-net-library %}),
+Since [the last time I wrote about logging]({% post_url 2014-10-26-logging-from-net-library %}),
 Microsoft appears to be working on [something totally new](https://github.com/aspnet/Logging)
 as part of ASP.NET vNext.
 
