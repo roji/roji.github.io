@@ -2,8 +2,8 @@
 main:
   #- title: About
   #  url: /about.html
-  - title: Posts
-    url: /posts.html
+  - title: Archive
+    url: /archive.html
   # - title: "Sample Posts"
   #   url: /year-archive/
   # - title: "Sample Collections"
