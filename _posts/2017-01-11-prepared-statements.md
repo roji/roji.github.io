@@ -12,7 +12,7 @@ Really important.
 
 Let's jump right in with some pgbench benchmarking of unprepared vs. prepared:
 
-![Prepared Statement Benchmark](/assets/img/pgbench-prepare-benchmark.png)
+![Prepared Statement Benchmark](/assets/images/pgbench-prepare-benchmark.png)
 
 This queries execute have increasing degrees of complexity, from a trivial `SELECT 1` to a join of 10 tables. As you can see, when joining 5 tables, preparation improves performance tenfold. The SQL executed in this scenario is:
 
@@ -60,7 +60,7 @@ Definitely embrace prepared statements - not doing so amounts to criminal neglig
 
 And to to finish this long and preachy blog post, here's an Npgsql benchmark which compares unprepared, automatically prepared and explicitly prepared performance in various query complexity scenarios, running against localhost (the benchmark is included in Npgsql's benchmarking suite):
 
-![Prepared Statement Benchmark](/assets/img/npgsql-prepare-benchmark.png)
+![Prepared Statement Benchmark](/assets/images/npgsql-prepare-benchmark.png)
 
 And the detailed results:
 

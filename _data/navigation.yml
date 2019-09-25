@@ -1,12 +1,9 @@
-# main links
 main:
-  #- title: About
-  #  url: /about.html
-  - title: Archive
-    url: /archive.html
-  # - title: "Sample Posts"
-  #   url: /year-archive/
-  # - title: "Sample Collections"
-  #   url: /collection-archive/
-  # - title: "Sitemap"
-  #   url: /sitemap/
+  - title: "Posts"
+    url: /posts/
+#  - title: "Categories"
+#    url: /categories/
+#  - title: "Tags"
+#    url: /tags/
+#  - title: "About"
+#    url: /about/
