@@ -10,7 +10,7 @@ locale                   : "en"
 title                    : "Shay Rojansky"
 title_separator          : "-"
 name                     : "Shay Rojansky"
-decription               : "Shay Rojansky, Microsoft MVP, C#/.NET open source and Linux expert specializing in data access. Lead dev of Npgsql, the PostgreSQL ADO.NET and Entity Framework providers."
+decription               : "Senior software engineer working on .NET data access and perf, member of the Entity Framework team at Microsoft. Lead dev of Npgsql, the PostgreSQL provider."
 url                      : http://www.roji.org
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : roji/roji.github.io
@@ -55,7 +55,7 @@ yandex_site_verification :
 
 # Social Sharing
 twitter:
-  username               : 
+  username               : shayrojansky
 facebook:
   username               :
   app_id                 :
@@ -79,7 +79,7 @@ analytics:
 author:
   name             : "Shay Rojansky"
   avatar           : https://www.gravatar.com/avatar/018fc595a3e6b1ac5c18cb27e73a066d
-  bio              : "Microsoft MVP, C#/.NET open source and Linux expert specializing in data access. Lead dev of Npgsql, the PostgreSQL ADO.NET and Entity Framework providers."
+  bio              : "Senior software engineer working on .NET data access and perf, member of the Entity Framework team at Microsoft. Lead dev of Npgsql, the PostgreSQL provider."
   location         : #"Somewhere"
   email            :
   uri              : http://npgsql.org
