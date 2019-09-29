@@ -1,0 +1,9 @@
+graph TD
+  Select --> Take
+  Select --> Projection["c => new { ... }"]
+  Take --> OrderBy
+  Take --> Count[5]
+  OrderBy --> Where
+  OrderBy --> Ordering["c => Age"]
+  Where --> EntityQueryable["DbSet"]
+  Where --> Predicate["c => c.Age > 18"]

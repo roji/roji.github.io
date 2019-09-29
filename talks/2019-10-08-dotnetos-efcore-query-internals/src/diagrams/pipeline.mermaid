@@ -1,0 +1,25 @@
+graph LR
+  TreeNode{Expression Tree}
+
+  subgraph Preprocessing
+    PreVisitor1(V1) --> MorePreprocessing
+    MorePreprocessing("...")
+  end
+
+  subgraph Translation
+    TranslationNode(Translation)
+  end
+
+  subgraph Postprocessing
+    PostVisitor1(V1) --> MorePostprocessing
+    MorePostprocessing("...")
+  end
+
+  SQL
+  Shaper
+
+  TreeNode --> PreVisitor1
+  MorePreprocessing --> TranslationNode
+  TranslationNode --> PostVisitor1
+  MorePostprocessing --> SQL
+  MorePostprocessing --> Shaper

@@ -1,0 +1,8 @@
+graph TD
+  Select --> |projections| NameProj[Name]
+  Select --> |predicate| GreaterThan
+  Select --> |take| Take[5]
+  Select --> |orderby| OrderBy[Age]
+  NameProj --> AgeProj[Age]
+  GreaterThan --> AgeGreaterThan[Age]
+  GreaterThan --> 18

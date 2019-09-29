@@ -1,0 +1,7 @@
+graph TD
+  Where --> EntityQueryable["DbSet"]
+  Where --> Lambda
+  Lambda --> MethodCall
+  MethodCall --> MethodInfo["Method(Contains)"]
+  MethodCall --> MemberAccess["Member(p.Name)"]
+  MethodCall --> Constant["Constant(dotnetos)"]
