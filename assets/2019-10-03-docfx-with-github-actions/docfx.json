@@ -1,0 +1,92 @@
+﻿{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [ "src/**/*.csproj" ],
+          "exclude": [ "src/MSI/**", "src/VSIX/**", "**/bin/**", "**/obj/**" ],
+          "cwd": "Npgsql/"
+        }
+      ],
+      "dest": "obj/api/Npgsql",
+      "properties": {
+        "TargetFramework": "netstandard2.1"
+      }
+    },
+    {
+      "src": [
+        {
+          "files": [ "src/**/*.csproj" ],
+          "exclude": [ "**/bin/**", "**/obj/**", "Properties/NpgsqlStrings.*" ],
+          "cwd": "EFCore.PG"
+        }
+      ],
+      "dest": "obj/api/EFCore.PG",
+      "properties": {
+        "TargetFramework": "netstandard2.1"
+      }
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "**/*.yml" ],
+        "cwd": "obj/api/Npgsql",
+        "dest": "doc/api"
+      },
+      {
+        "files": [ "**/*.yml" ],
+        "cwd": "obj/api/EFCore.PG",
+        "dest": "efcore/api"
+      },
+      {
+        "files": [ "**.md" ],
+        "cwd": "conceptual/Npgsql",
+        "dest": "doc"
+      },
+      {
+        "files": [ "**.md" ],
+        "cwd": "conceptual/EFCore.PG",
+        "dest": "efcore"
+      },
+      {
+        "files": [ "**.md" ],
+        "cwd": "conceptual/EF6.PG",
+        "dest": "ef6"
+      },
+      {
+        "files": [ "*.md", "dev/**.md", "toc.yml" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [ "img/**", "CNAME" ]
+      }
+    ],
+    "globalMetadata": {
+      "_appTitle": "Npgsql Documentation",
+      "_appFooter": "© Copyright 2019 The Npgsql Development Team",
+      "_appLogoPath": "img/logo.svg",
+      "_appFaviconPath": "img/favicon.ico",
+      "_enableSearch": true
+    },
+    "fileMetadata": {
+      "_gitContribute" : {
+        "Npgsql/**.md": {
+          "repo": "https://github.com/npgsql/Npgsql",
+          "branch": "master"
+        },
+        "Npgsql.EntityFrameworkCore.PostgreSQL/**.md": {
+          "repo": "https://github.com/npgsql/Npgsql.EntityFrameworkCore.PostgreSQL"
+	},
+        "EntityFramework6.Npgsql/**.md": {
+          "repo": "https://github.com/npgsql/EntityFramework6.Npgsql"
+	},
+        "obj/api/**.yml": {
+          "repo": "https://github.com/npgsql/Npgsql"
+	}
+      }
+    },
+    "dest" : "live"
+  }
+}
