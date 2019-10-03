@@ -16,7 +16,7 @@
 title: Shay Rojansky's Blog
 email: roji@roji.org
 description: >-
-  Senior software engineer working on .NET data access and perf, member of the Entity Framework team at Microsoft.
+  Microsoft software engineer working on .NET data access and perf, member of the Entity Framework team.
   Lead dev of Npgsql, the PostgreSQL provider.
 twitter_username: shayrojansky
 github_username: roji
@@ -59,7 +59,7 @@ plugins:
 author:
   name   : "Shay Rojansky"
   avatar : https://www.gravatar.com/avatar/018fc595a3e6b1ac5c18cb27e73a066d
-  bio    : "Senior software engineer working on .NET data access and perf, member of the Entity Framework team at Microsoft. Lead dev of Npgsql, the PostgreSQL provider."
+  bio    : "Microsoft software engineer working on .NET data access and perf, member of the Entity Framework team. Lead dev of Npgsql, the PostgreSQL provider."
   links:
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
