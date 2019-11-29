@@ -1,0 +1,31 @@
+graph LR
+  TreeNode((Expression Tree)) --> ParameterExtractor(Parameter Extractor)
+  ParameterExtractor --> Cache{"Is Cached?"}
+
+  subgraph Compilation
+    subgraph Preprocessing
+      PreVisitor1(V1) --> MorePreprocessing
+      MorePreprocessing("...")
+    end
+
+    subgraph Translation
+      TranslationNode(Translation)
+    end
+
+    subgraph Postprocessing
+      PostVisitor1(V1) --> MorePostprocessing
+      MorePostprocessing("...")
+    end
+
+  end
+
+  Shaper
+  SQL
+
+  Cache --> |No| PreVisitor1
+  MorePreprocessing --> TranslationNode
+  TranslationNode --> PostVisitor1
+  MorePostprocessing --> SQL
+  MorePostprocessing --> Shaper
+  Cache --> |Yes| SQL
+  Cache --> |Yes| Shaper
