@@ -19,6 +19,7 @@ description: >-
   Microsoft software engineer working on .NET data access and perf, member of the Entity Framework team.
   Lead dev of Npgsql, the PostgreSQL provider.
 twitter_username: shayrojansky
+github: [metadata]
 github_username: roji
 minimal_mistakes_skin: air
 search: true
