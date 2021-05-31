@@ -6,8 +6,9 @@ classes: wide
 
 Here are some talks I gave:
 
-Date       | Talk Title                                                      | Conference                                  | Presentation | Recording
----------- | ----------------------------------------------------------------| --------------------------------------------| ------------ | ---------
+Date       | Talk Title                                                      | Conference                                   | Presentation | Recording
+---------- | ----------------------------------------------------------------| -------------------------------------------- | ------------ | ---------
+2021-06-22 | PostgreSQL and .NET - a high-perf, 1st class experience         | [Postgres Vision 2021](https://www.postgresvision.com) | [slides](2021-06-22-postgres-vision) | [recording](https://www.postgresvision.com/2021/session-videos/open)
 2020-11-10 | Entity Framework Core 5.0: The Next Generation for Data Access  | [.NET Conf 2020](https://www.dotnetconf.net) | | [recording](https://www.youtube.com/watch?reload=9&v=BIImyq8qaD4)
 2020-10-28 | EF Core 5.0 Collations and Case Sensitivity                     | [.NET Community Standup](https://dotnet.microsoft.com/platform/community/standup) | | [recording](https://www.youtube.com/watch?v=OgMhLVa_VfA&list=PLdo4fOcmZ0oX-DBuRG4u58ZTAJgBAeQ-t&index=1)
 2019-11-30 | Deep dive into an ORM: The Entity Framework Core Query Pipeline | [Codecamp](https://codecamp.ro/cluj), Romania | [slides](2019-11-30-codecamp-efcore-query-internals) ([src](https://github.com/roji/roji.github.io/tree/master/talks/2019-11-30-codecamp-efcore-query-internals/src))
