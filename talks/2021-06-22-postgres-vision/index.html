@@ -1,0 +1,571 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown data-background-image="img/pgvision.png" data-background-size="150px 54px" data-background-position="bottom 30px left 30px">
+				  <textarea data-template>
+# PG and .NET
+
+A high-perf, 1st class experience
+
+<img src="img/postgresql.png" width="120" />
+<img src="img/dotnetbot.png" width="120" />
+
+---
+
+## whoami
+
+* Shay Rojansky
+* Engineer at Microsoft, part of the .NET data team
+* Lead dev of Npgsql
+  * .NET driver for PostgreSQL
+  * PG provider for Entity Framework Core
+* Linux guy
+* Based in Berlin
+
+Note:
+Started with Slackware around 1995
+---
+
+## Microsoft? .NET? Here??
+
+* .NET Core open source since 2016 (MIT license)
+* Cross-platform - 1st class support for Linux, macOS <!-- .element: class="fragment" -->
+* Specific interest in PostgreSQL (Azure, Citus Data) <!-- .element: class="fragment" -->
+
+Note:
+* Used to be.NET Framework, Windows-only...
+* Everything on Github, MS is one of the top contributors
+
+---
+
+## Performance
+
+TechEmpower Round 20 (Feb 2021)
+
+![TechEmpower round 20 composite scores](img/techempower.png "Logo Title Text 1")
+
+<div class="fragment">... running on Linux with PostgreSQL</div>
+
+Note:
+* Does not include newer improvements for .NET 6
+* Many of these are experiments, not full-fledged web frameworks etc.
+* The first Fortunes MySQL entry is 44th place
+
+---
+
+# Accessing PG in .NET
+
+---
+
+## .NET database API - ADO.NET
+
+Similar to JDBC, Python DB API...
+
+<pre><code class="language-csharp" style="font-size: 0.75em" data-trim data-noescape>
+await using var conn 
+    = new NpgsqlConnection("Host=localhost;Username=test;Password=test");
+await conn.OpenAsync();
+
+await using var command = new NpgsqlCommand("SELECT * FROM data", conn);
+await using var reader = await command.ExecuteReaderAsync();
+
+while (await reader.ReadAsync())
+{
+    Console.WriteLine($"data: {reader.GetInt32(0)} -> {reader.GetString(1)}");
+}
+</code></pre>
+
+Note:
+* Talk about async and the relationship to perf, callback-based alternative
+* Async/await spread to other languages, e.g. JS
+---
+
+## Dapper
+
+A lightweight, performant object mapper
+
+<pre><code class="language-csharp" style="font-size: 0.75em" data-trim data-line-numbers data-noescape>
+await using var conn
+    = new NpgsqlConnection("Host=localhost;Username=test;Password=test");
+await conn.OpenAsync();
+
+foreach (var d in await conn.QueryAsync("SELECT * FROM data"))
+{
+     Console.WriteLine($"Got some data: {d.Id} -> {d.Name}");
+}
+</code></pre>
+
+Note:
+* Can be mapped to your own .NET types ("ORM")
+
+---
+
+## Npgsql
+
+* Open-source ADO.NET driver for PostgreSQL
+* Originally started in 2002
+* Fully managed .NET library, no native
+* Full-featured, keeps up with latest PG features
+* High-performance orientation
+
+Note:
+* I got involved in 2013, eventually rewrote
+* Mention Devart for completeness
+
+---
+
+## Complex type mapping
+
+<pre><code class="language-csharp" style="font-size: 0.75em" data-trim data-line-numbers data-noescape><script type="text/template">
+NpgsqlConnection.GlobalTypeMapper.MapComposite<ComplexNumber>();
+...
+while (await reader.ReadAsync())
+{
+    var array = reader.GetFieldValue<int[]>(0);
+    var range = reader.GetFieldValue<NpgsqlRange<int>>(1);
+    var composite = reader.GetFieldValue<ComplexNumber>(2);
+}
+
+struct ComplexNumber
+{
+    public double R { get; set; }
+    public double I { get; set; }
+}
+</script></code></pre>
+
+Note:
+A few words on flexible type mapping, handlers. NodaTime.
+
+---
+
+## Other highlights
+
+* New multiple hosts feature (late but really good!) <!-- .element: class="fragment" -->
+* Powerful COPY API for import/export - text but also binary <!-- .element: class="fragment" -->
+* Logical replication support (physical too) <!-- .element: class="fragment" -->
+* LISTEN/NOTIFY <!-- .element: class="fragment" -->
+
+Note:
+* Multiple hosts - integrates with and leverage the in-driver connection pool
+* Mention PG14 replication features - streaming transactions, binary encoding...
+
+---
+
+## Npgsql and performance
+
+* Full async support (but also sync) <!-- .element: class="fragment" -->
+* Binary-only <!-- .element: class="fragment" -->
+* Aims to not parse/manipulate SQL <!-- .element: class="fragment" -->
+* Buffers rows by default, not resultsets <!-- .element: class="fragment" -->
+    * Can read rows sequentially too <!-- .element: class="fragment" -->
+* Has its own high-perf connection pool <!-- .element: class="fragment" -->
+* Auto-prepared statement cache <!-- .element: class="fragment" -->
+
+---
+
+## ORMs
+
+<div class="fragment">Can't live with them...</div>
+
+<div class="fragment">... can't live without them.</div>
+
+---
+
+## Without ORMs we:
+
+* ... write SQL (without compile-time verification) <!-- .element: class="fragment" -->
+* ... deserialize results (materialization) <!-- .element: class="fragment" -->
+* ... lack various higher-level functionality <!-- .element: class="fragment" -->
+* ... are tied to a specific database <!-- .element: class="fragment" -->
+
+<div class="fragment">But ORMs limit access to low-level, db-specific features...</div>
+
+Note:
+Lines are blurry - dapper does materialization
+
+---
+
+## .NET ORMs
+
+* LLBLGen Pro
+* NHibernate
+* Linq to DB
+* Entity Framework 6
+* Entity Framework Core
+* Others...
+
+Note:
+* EF Core released in 2016, rewrite.
+* Not just relational database
+* EF6+EF Core massively used more
+
+---
+
+## Expressing queries
+
+Hibernate HQL:
+
+<pre><code class="language-java" style="font-size: 0.75em" data-trim data-noescape><script type="text/template">
+String hql = "FROM Employee E WHERE E.id > 10 ORDER BY E.salary DESC";
+</script></code></pre>
+
+* Similar: JPQL, Doctrine DQL <!-- .element: class="fragment" -->
+* No static typing or compile-time checking <!-- .element: class="fragment" -->
+* Don't have to learn SQL, but have to learn *QL <!-- .element: class="fragment" -->
+
+Note:
+Yes, we get database-agnostic *QL
+---
+
+## Expressing queries
+
+Hibernate criteria API:
+
+<pre><code class="language-java" style="font-size: 0.75em" data-trim data-noescape><script type="text/template">
+Criteria crit = session.createCriteria(Product.class);
+Criterion priceLessThan = Restrictions.lt("price", 10.0);
+Criterion mouse = Restrictions.ilike("description", "mouse", MatchMode.ANYWHERE);
+LogicalExpression orExp = Restrictions.or(priceLessThan, mouse);
+crit.add(orExp);
+List results=crit.list();
+</script></code></pre>
+
+<pre><code class="fragment language-pgsql" style="font-size: 0.75em" data-trim data-noescape><script type="text/template">
+... WHERE product.price < 10.0 OR description LIKE %mouse%
+</script></code></pre>
+
+---
+
+## Expressing queries
+
+SQLAlchemy:
+
+<pre><code class="language-python" style="font-size: 0.75em" data-trim data-noescape><script type="text/template">
+query.filter(and_(User.name == 'ed', User.fullname == 'Ed Jones'))
+</script></code></pre>
+
+<div class="fragment">Make sure you use and_() and not the Python and operator!</div>
+
+Note:
+Better, but we just want to write code
+
+---
+
+## LINQ
+
+C# Language-Integrated Query:
+
+```c#
+var someArray = new[] { 1, 10, 2 };
+var result = someArray
+    .Where(i => i > 5)
+    .OrderBy(i => i)
+    .Take(2)
+    .ToArray();
+```
+
+These are functional query operators, working in-memory.
+
+Note:
+* Everything is static
+* Emphasize that this can be done on any enumerable
+
+---
+
+## IQueryable
+
+C# allows us to use LINQ to express queries that don't run in-memory:
+
+```c#
+var employees = db.Employees
+    .Where(e => e.Salary > 1000)
+    .OrderBy(e => e.Salary)
+    .Take(2)
+    .ToArray();
+```
+
+* Instead of evaluating, the compiler constructs an expression tree <!-- .element: class="fragment" -->
+* The expression tree can be translated to SQL (or something else) <!-- .element: class="fragment" -->
+
+Note:
+Still static...
+Not just EF Core
+
+---
+
+## Fancier stuff
+
+```c#
+var blogs = await ctx.Blogs
+    .Where(b => b.Posts
+        .Any(p => p.Title.Trim() == "foo"))
+    .ToListAsync();
+```
+
+<div class="fragment">
+Generated SQL:
+
+<pre><code class="language-pgsql" style="font-size: 0.8em" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.name
+FROM blogs AS b
+WHERE EXISTS (
+    SELECT 1
+    FROM post AS p
+    WHERE (b.id = p.blog_id) AND (btrim(p.title, E' \t\n\r') = 'foo'))
+</script></code></pre>
+
+Note the function translation!
+
+</div>
+
+Note:
+Talk more about function translation. Give the NetTopologySuite example with PostGIS.
+
+---
+
+## IQueryable is great! But...
+
+* Awesome: we can use regular C# language constructs to express SQL queries
+* Caveat1: we can express far more than what is translatable to SQL <!-- .element: class="fragment" -->
+* Caveat2: there are many mismatches between C# and SQL <!-- .element: class="fragment" -->
+* Caveat3: what can be expressed can't always be translated efficiently <!-- .element: class="fragment" -->
+
+---
+
+## Parameters
+
+
+How do we bind parameters?
+
+<pre><code class="fragment language-pgsql" style="font-size: 0.8em" data-trim data-noescape><script type="text/template">
+var name = "foo";
+_ = await ctx.Blogs
+    .Where(b => b.Name == name)
+    .ToListAsync();
+</script></code></pre>
+
+<div class="fragment">
+
+SQL:
+
+<pre><code class="language-pgsql" data-trim data-noescape><script type="text/template">
+SELECT [b].[id], [b].[name]
+FROM [blogs] AS [b]
+WHERE [b].[name] = $1
+</script></code></pre>
+
+Important for SQL injection, but also auto-preparation
+</div>
+
+Note:
+Closure. Compare with the previous constant.
+
+---
+
+## Arrays
+
+```c#
+var names = new[] { "name1", "name2" };
+_ = await ctx.Blogs
+    .Where(b => names.Contains(b.Name))
+    .ToListAsync();
+```
+
+<div class="fragment">
+SQL Server:
+
+<pre><code class="language-sql" data-trim data-noescape><script type="text/template">
+SELECT [b].[Id], [b].[Name]
+FROM [Blogs] AS [b]
+WHERE [b].[Name] IN (N'name1', N'name2')
+</script></code></pre>
+</div>
+
+<div class="fragment">
+PostgreSQL:
+
+<pre><code class="language-pgsql" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.name
+FROM blogs AS b
+WHERE b.name = ANY ($1)
+</script></code></pre>
+</div>
+
+<div class="fragment">(uses index on "name")</div>
+
+---
+
+## Arrays
+
+Let's flip it around:
+
+```c#
+var tag = "foo";
+_ = await ctx.Blogs
+    .Where(b => b.Tags.Contains(tag))
+    .ToListAsync();
+```
+
+<div class="fragment">
+PostgreSQL:
+
+<pre><code class="language-pgsql" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.name, b.tags
+FROM blogs AS b
+WHERE b.tags @> ARRAY[$1]::text[]
+</script></code></pre>
+</div>
+
+<div class="fragment">(uses GIN index on "tags")</div>
+
+---
+
+## Arrays
+
+```c#
+var tags = new[] { "tag1", "tag2" };
+_ = await ctx.Blogs
+    .Where(b => b.Tags.Any(t => tags.Contains(t)))
+    .ToListAsync();
+```
+
+<div class="fragment">
+PostgreSQL:
+
+<pre><code class="language-pgsql" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.name, b.tags
+FROM blogs AS b
+WHERE b."Tags" && $1
+</script></code></pre>
+</div>
+
+---
+
+## JSON
+
+<pre><code class="language-csharp" data-line-numbers data-trim data-noescape><script type="text/template">
+public class Blog
+{
+    public int Id { get; set; }
+    [Column(TypeName = "jsonb")]
+    public Statistics Statistics { get; set; }
+}
+
+public class Statistics
+{
+    public int UniqueVisitors { get; set; }
+    public string Category { get; set; }
+    public InternalStatistics MoarStats { get; set; }
+}
+</script></code></pre>
+
+<pre><code class="fragment language-pgsql" data-trim data-noescape><script type="text/template">
+CREATE TABLE blogs (
+    id integer PRIMARY KEY GENERATED BY DEFAULT AS IDENTITY,
+    statistics jsonb NULL,
+    CONSTRAINT pk_blogs PRIMARY KEY (id)
+);
+</script></code></pre>
+
+---
+
+## JSON
+
+```c#
+var blogs = await ctx.Blogs
+    .Where(b => b.Statistics.Category  == "foo")
+    .ToListAsync();
+```
+
+<div class="fragment">
+SQL:
+
+<pre><code class="language-pgsql" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.statistics
+FROM "Blogs" AS b
+WHERE b.statistics->>'Category' = 'foo'
+</script></code></pre>
+</div>
+
+Note:
+This usually generates a JOIN
+GIN index to speed up
+
+---
+
+## JSON
+
+Let's drill deeper:
+
+<pre><code class="language-pgsql" style="font-size: 0.8em" data-trim data-noescape><script type="text/template">
+var blogs = await ctx.Blogs
+    .Where(b => b.Statistics.MoarStats.SomeArray.Length == 4)
+    .ToListAsync();
+</script></code></pre>
+
+<div class="fragment">
+SQL:
+
+<pre><code class="language-pgsql" style="font-size: 0.8em" data-trim data-noescape><script type="text/template">
+SELECT b.id, b.name, b.statistics
+FROM blogs AS b
+WHERE jsonb_array_length(b.statistics #> '{MoarStats,SomeArray}') = 4
+</script></code></pre>
+</div>
+
+---
+
+## Closing Words
+
+* Everybody loves ORMs <span class="fragment">... and everybody hates ORMs</span>
+* ORMs don't necessarily block DB-specific stuff! <!-- .element: class="fragment" -->
+* PG + .NET = &hearts; <!-- .element: class="fragment" -->
+* Both PG and .NET are very fast <!-- .element: class="fragment" -->
+---
+
+## Thank you!!
+
+**Shay Rojansky**, <http://roji.org>, @shayrojansky
+
+<img src="img/postgresql.png" width="120" />
+<img src="img/dotnetbot.png" width="120" />
+
+
+				  </textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				slideNumber: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
