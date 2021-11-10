@@ -4,6 +4,9 @@ permalink: /postgresql-dotnet-timestamp-mapping
 modified: 2021-10-10
 comments: true
 ---
+
+**INTERESTED IN TIMESTAMPS? SEE ALSO [When "UTC everywhere" isn't enough - storing time zones in PostgreSQL and SQL Server](/storing-timezones-in-the-db)**
+
 Npgsql 6.0 contains some significant changes to how timestamps are mapped between .NET and PostgreSQL - most applications will need to react to this (although a compatibility flag exists). This post gives the context for these changes, going over the timestamp types on both sides and the problems in mapping them.
 
 ## PostgreSQL timestamps
@@ -60,6 +63,8 @@ For those interested, here are a few thoughts on flaws in the PostgreSQL timesta
 * `timestamp` is sometimes treated as a local timestamp (e.g. when converting it to `timestamptz`), but sometimes is simply an unspecified timestamp.
 * `time with time zone` makes no sense.
 
+**INTERESTED IN TIMESTAMPS? SEE ALSO [When "UTC everywhere" isn't enough - storing time zones in PostgreSQL and SQL Server](/storing-timezones-in-the-db)**
+
 [^1]:
     For more information on when "UTC Everywhere" is less appropriate and how to deal with it, see this great [post](https://codeblog.jonskeet.uk/2019/03/27/storing-utc-is-not-a-silver-bullet/) by Jon Skeet.
 
@@ -74,3 +79,4 @@ For those interested, here are a few thoughts on flaws in the PostgreSQL timesta
 
 [^5]:
     This means that version 6.0 of the EF Core provider triggers creation of a migration of all DateTime properties from `timestamp` to `timestamptz` - this should be done with care. [The release notes](https://www.npgsql.org/efcore/release-notes/6.0.html#migrating-columns-from-timestamp-to-timestamptz) provide advice on how to safely do this.
+
