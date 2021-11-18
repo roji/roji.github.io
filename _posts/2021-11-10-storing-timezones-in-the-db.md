@@ -91,7 +91,7 @@ var events = await ctx.Events
 This will translate to the following query:
 
 ```sql
-SELECT e."Id", e."LocalTimestamp", e."TimeZoneId", e."UtcTimestamp"
+SELECT e."Id", e."LocalTimestamp", e."TimeZoneId"
 FROM "Events" AS e
 ORDER BY e."LocalTimestamp" AT TIME ZONE e."TimeZoneId"
 ```
