@@ -8,6 +8,7 @@ Here are some talks I gave:
 
 Date       | Talk Title                                                      | Conference                                   | Presentation | Recording
 ---------- | ----------------------------------------------------------------| -------------------------------------------- | ------------ | ---------
+2022-04-20 | Performance Improvements to the EF7 Update Pipeline             | [.NET Community Standup](https://dotnet.microsoft.com/platform/community/standup) | | [recording](https://www.youtube.com/watch?v=EXbuRVqxn2o)
 2021-09-23 | PostgreSQL and EF Core                                          | [.NET Community Standup](https://dotnet.microsoft.com/platform/community/standup) | | [recording](https://www.youtube.com/watch?v=Ya_cmZRwACM&list=PLdo4fOcmZ0oX-DBuRG4u58ZTAJgBAeQ-t&index=7)
 2021-06-22 | PostgreSQL and .NET - a high-perf, 1st class experience         | [Postgres Vision 2021](https://www.postgresvision.com) | [slides](2021-06-22-postgres-vision) | [recording](https://www.postgresvision.com/2021/session-videos/open)
 2020-11-10 | Entity Framework Core 5.0: The Next Generation for Data Access  | [.NET Conf 2020](https://www.dotnetconf.net) | | [recording](https://www.youtube.com/watch?reload=9&v=BIImyq8qaD4)
