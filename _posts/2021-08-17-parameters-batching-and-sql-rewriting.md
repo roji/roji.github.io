@@ -105,3 +105,5 @@ All the above is available in Npgsql as of 6.0.0-preview7. Unfortunately, positi
 One last point... The new .NET batching API wasn't introduced just so that Npgsql could avoid parsing its SQL. While SQL Server does natively support multiple semicolon-separated statements in a single command (or "batch" in SQL Server parlance), there are some significant drawbacks for doing so - [read this old post for the details](https://docs.microsoft.com/en-us/archive/blogs/dataaccess/does-ado-net-update-batching-really-do-something). We also have good reason to believe that the MySQL provider can benefit from a better batching API as well - so  lots to look forward to.
 
 Oh, and thanks to [@NinoFloris](https://github.com/NinoFloris/) for some very helpful conversations on this!
+
+**UPDATE 2022-05-09**: Amazing timing... PostgreSQL 14 has introduced new syntax which breaks Npgsql's SQL parsing logic, and will probably be non-trivial to recognize properly... see [this issue](https://github.com/npgsql/npgsql/issues/4445). This shows what a bad idea it is for a driver to be parsing SQL.
