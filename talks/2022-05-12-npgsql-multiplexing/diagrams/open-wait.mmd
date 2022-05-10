@@ -1,0 +1,7 @@
+sequenceDiagram
+    John->>Pool: I need a connection
+    loop
+        Pool->>Pool: Waiting...
+    end
+    Mary-->>Pool: I'm done with this connection
+    Pool-->>John: Here's Mary's connection, sorry it took so long

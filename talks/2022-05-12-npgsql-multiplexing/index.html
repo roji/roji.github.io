@@ -1,0 +1,592 @@
+<!doctype html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Introducing Npgsql multiplexing: a high-performance database driver model</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+  </head>
+
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+      <section data-markdown>
+        <textarea data-template>
+# Npgsql multiplexing
+
+A high-performance database driver model
+
+---
+
+## whoami
+
+* Shay Rojansky
+* Engineer at Microsoft, part of the .NET data team
+* Lead dev of Npgsql, PostgreSQL driver for .NET
+* Linux guy
+* Based in Berlin
+
+Note:
+Started with Slackware around 1995
+
+---
+
+## Who is Npgsql?
+
+* .NET open-source driver for PostgreSQL
+  * There's also an EF Core provider, but we'll focus on the low-level (ADO.NET). 
+* Bottom of the stack - beneath us is the .NET runtime <!-- .element: class="fragment" -->
+* Supposed to be a boring component! <!-- .element: class="fragment" -->
+
+---
+
+## Performance
+
+TechEmpower Round 20 (Feb 2021)
+
+![TechEmpower round 20 composite scores](img/techempower.png "Logo Title Text 1")
+
+<div class="fragment">... running on Linux with PostgreSQL</div>
+
+Note:
+
+* Already old (Feb 2021)
+* Does not include newer improvements for .NET 6
+* Many of these are experiments, not full-fledged web frameworks etc.
+* The first Fortunes MySQL entry is 44th place
+
+---
+
+## What's this talk about?
+
+* Multiplexing is an experimental perf feature released in November 2020 (Npgsql 5.0).
+* Other database drivers do this, but not in the .NET world. <!-- .element: class="fragment" -->
+* Connection pooling, network buffering, coalescing, and a whole lot of low-level perf goodness. <!-- .element: class="fragment" -->
+
+---
+
+# Let's begin!
+
+---
+
+# Traditional connection pooling
+
+---
+
+## Typical low-level DB code
+
+```csharp
+await using var connection = new NpgsqlConnection("...");
+await connection.OpenAync();
+await using var command = new NpgsqlCommand("SELECT * FROM foo", connection);
+await using var reader = await command.ExecuteReaderAsync();
+
+// Consume results from the reader
+```
+
+---
+
+## Connection pooling
+
+* Opening a physical connection every time is slow.
+  * Network roundtrip(s) (TLS!)
+  * In PG, spawn process for each connection
+* Like every perf problem in the universe, the answer is caching, or connection pooling <!-- .element: class="fragment" -->
+
+---
+
+## Connection pooling flow
+
+![Traditional connection sequence diagram](diagrams/traditional-sequence-diagram.svg)
+
+---
+
+## Where to pool?
+
+* #1: In .NET: in-process pooling, in the driver.
+* #2: Java: the pool is a separate standard API. <!-- .element: class="fragment" -->
+* #3: Out-of-process (pgbouncer2, pgpool, odyssey). <!-- .element: class="fragment" -->
+* In-process is faster (zero network overhead) and easier to set up. <!-- .element: class="fragment" -->
+* External allows pooling across multiple app instances. <!-- .element: class="fragment" -->
+
+![Why not both](img/why-not-both.jpeg) <!-- .element: class="fragment" -->
+
+Note:
+
+* The connection pool is the one component dealing with concurrency and shared mutable state.
+* I used to think the Java pooling API model was great, but we'll see that it has drawbacks.
+
+---
+
+## Maximum connections
+
+* The pool always as a max connection size, setting an upper bound on server resources. <!-- .element: class="fragment" -->
+* An attempt open when saturated waits until someone else releases (or until timeout). <!-- .element: class="fragment" -->
+
+![Open with wait](diagrams/open-wait.svg) <!-- .element: class="fragment" -->
+
+Note:
+
+* Max Pool Size is 100 by default
+* Very important to have a hard limit (server resources). Compare with memory object pooling.
+---
+
+# Let's evolve this!
+
+---
+
+## Empty trains
+
+* Physical connections are exclusively "locked" for the duration of the command.
+* We're sending out trains with only a single passenger each. <!-- .element: class="fragment" data-fragment-index="1" -->
+
+![Empty train](img/empty-train.png) <!-- .element: class="fragment" data-fragment-index="1" -->
+
+---
+
+## Fill trains with passengers
+
+* We can fill the same train with multiple unrelated passengers ...
+  * .. as long as they arrive around the same time. <!-- .element: class="fragment" -->
+* Benefits: <!-- .element: class="fragment" -->
+  * Less TCP packet fragmentation
+  * Less I/O system calls (both client and server) <!-- .element: class="fragment" -->
+
+---
+
+## Without multiplexing
+
+![Pool without multiplexing](diagrams/pool-without-multiplexing.svg)
+
+---
+
+## With Multiplexing
+
+<div class="r-stack">
+  <img src="diagrams/pool-with-multiplexing.svg" />
+  <img class="fragment" src="img/full-train.png" />
+</div>
+
+---
+
+## Busy trains
+
+* The more commands we pack into the same write, the more we save on overhead. <!-- .element: class="fragment" -->
+  * In TechEmpower Fortunes, we see around 23 commands per write.
+* For this to work, lots of commands need to be submitted simultaneously <!-- .element: class="fragment" -->
+  * Optimizes the massive load scenario
+
+---
+
+## Coalescing and Nagling
+
+* This is a form of implicit batching, or *coalescing*.
+* Nagle's algorithm: TCP/IP optimization to coalesce together small writes into a single packet. <!-- .element: class="fragment" -->
+* Nagling works on a single TCP socket; we combine from multiple query producers. <!-- .element: class="fragment" -->
+* Nagling compensates for poor application I/O practices (no buffering). <!-- .element: class="fragment" -->
+  * Typically disabled (TCP_NODELAY), because increases latency.
+
+---
+
+# Advantage #1:
+
+## Coalescing
+
+---
+
+## Perf benefits
+
+<ul>
+  <li>Without multiplexing, the optimal RPS in TechEmpower Fortunes is <span style="color: red">213,689</span>.</li>
+  <li class="fragment">With multiplexing: <span style="color: red">454,254</span> (112% improvement).</li>
+  <li class="fragment">... but it's not just about the coalescing :)</li>
+</ul>
+
+---
+
+## Saturation
+
+* Remember: in traditional pooling, we wait when saturated - all connections are locked.
+* In multiplexing, we can do better: continue pushing commands to the database, even if they're busy! <!-- .element: class="fragment" -->
+* We call this "overcapacity mode". <!-- .element: class="fragment" -->
+
+---
+
+## Under capacity
+
+Use only idle connection as long as we can...
+
+![Under capacity](diagrams/multiplexing-under-capacity.svg)
+
+---
+
+## Over capacity
+
+... but keep pushing commands into busy connections
+
+![Over capacity](diagrams/multiplexing-over-capacity.svg)
+
+---
+
+## Advantages
+
+* Pipelining: get commands to the DB faster, even while it's still processing previous commands.
+* As long as the DB is processing faster than we send, we're pipelining efficiently. <!-- .element: class="fragment" -->
+* If we send faster than the DB processes, eventually TCP buffers get full (TCP zero window). <!-- .element: class="fragment" -->
+  * And we block, just like before.
+
+Note:
+
+If we get to TCP zero window, all bets are off - the DB is totally overloaded.
+
+---
+
+# Advantage #2:
+
+## Better handling of saturation
+
+---
+
+## How many DB connections should I have?
+
+* The answer depends on server resources, especially number of cores. <!-- .element: class="fragment" -->
+* Also: are queries going to be doing lots of I/O? <!-- .element: class="fragment" -->
+* If we increase (in-use) connections too much, we start to cause useless context-switching. <!-- .element: class="fragment" -->
+
+Note:
+* Make it clear that TechEmpower Fortunes does very little I/O.
+
+---
+
+## Less connections
+
+* Thanks to multiplexing over-capacity, we can lower the connection count and not starve client-side.
+* Do more with less: far more efficient use of physical connections. <!-- .element: class="fragment" -->
+* This helps the DB by reducing context switching. <!-- .element: class="fragment" -->
+* Even at extremely low connection counts, we're still very efficient. <!-- .element: class="fragment" -->
+* The multiplexing pool acts as a sort of "backpressure" for connections. <!-- .element: class="fragment" -->
+
+---
+
+## Multiplexing benefits
+
+1. Coalescing (less overhead)
+2. Over-capacity mode (saturation)
+3. Reduce number of connections needed
+
+        </textarea>
+      </section>
+
+      <section>
+        <h3>Showdown!</h3>
+        <div style="height:480px">
+          <canvas data-chart="line">
+<!--
+{
+ "data": {
+  "labels": [4, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 32, 64, 128, 256, 512, 1024],
+  "datasets":[
+   {
+    "data":[32654, 62287, 62591, 92192, 104095, 103656, 113247, 112887, 117973, 117768, 118512, 117486, 135367, 134426, 166579, 212015, 205626, 182774, 158488, 157878],
+    "label":"Non-multiplexing","backgroundColor":"rgba(20,220,220,.8)"
+   },
+   {
+    "data":[173947, 317797, 429286, 446404, 439144, 442321, 448757, 447464, 446944, 454254, 451049, 451359, 434753, 436417, 444209, 430800, 430354, 422634, 436288, 426943],
+    "label":"Multiplexing","backgroundColor":"rgba(220,120,120,.8)"
+   }
+  ]
+ },
+ "options":
+ {
+    "scales":
+    {
+      "x":
+      {
+        "title":
+        {
+          "display": "true",
+          "text": "Max Pool Size"
+        }
+      },
+      "y":
+      {
+        "title":
+        {
+          "display": "true",
+          "text": "Requests Per Second"
+        }
+      }
+    }
+  }
+}
+-->
+		  </canvas>
+        </div>
+
+        <aside class="notes">
+          <ul>
+          	<li>Mention that the X-axis isn't linear!</li>
+          	<li>Classical mode peaks much later than multiplexing (64 connections vs 19).</li>
+          	<li>Even with 12 connections, multiplexing is already very close to peak.</li>
+          </ul>
+        </aside>
+
+      </section>
+
+      <section>
+        <h3>Non-multiplexing</h3>
+        <div style="height:480px">
+          <canvas data-chart="line">
+<!--
+{
+  "data":
+  {
+    "labels": [4, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 32, 64, 128, 256, 512, 1024],
+    "datasets":
+    [
+      {
+        "yAxisID": "rps",
+        "label":"RPS",
+        "data":[32654, 62287, 62591, 92192, 104095, 103656, 113247, 112887, 117973, 117768, 118512, 117486, 135367, 134426, 166579, 212015, 205626, 182774, 158488, 157878],
+        "backgroundColor":"rgba(20,220,220,.8)"
+      },
+      {
+        "yAxisID": "db_cpu",
+        "label": "DB CPU",
+        "data": [8, 17, 17, 27, 32, 32, 37, 36, 38, 39, 39, 39, 48, 48, 68, 97, 99, 99, 100, 100],
+        "backgroundColor":"rgba(220,120,120,.8)"
+      }
+    ]
+  },
+  "options":
+  {
+    "scales":
+    {
+      "x":
+      {
+        "title":
+        {
+          "display": "true",
+          "text": "Max Pool Size"
+        }
+      },
+      "rps": 
+      {
+        "type": "linear",
+        "position": "left",
+        "title":
+        {
+          "display": "true",
+          "text": "Requests Per Second"
+        }
+      },
+      "db_cpu":
+      {
+        "type": "linear",
+        "position": "right",
+        "min": 0,
+        "max": 100,
+        "title":
+        {
+          "display": "true",
+          "text": "DB CPU"
+        }
+      }
+    }
+  }
+}
+-->
+		  </canvas>
+        </div>
+
+        <aside class="notes">
+          <ul>
+          	<li>RPS is total correlated to DB CPU until the peak (DB CPU=100%), then starts to drop off.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section>
+        <h3>Multiplexing</h3>
+        <div style="height:480px">
+          <canvas data-chart="line">
+<!--
+{
+  "data":
+  {
+    "labels": [4, 8, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 32, 64, 128, 256, 512, 1024],
+    "datasets":
+    [
+      {
+        "yAxisID": "rps",
+        "label":"RPS",
+        "data":[173947, 317797, 429286, 446404, 439144, 442321, 448757, 447464, 446944, 454254, 451049, 451359, 434753, 436417, 444209, 430800, 430354, 422634, 436288, 426943],
+        "backgroundColor":"rgba(20,220,220,.8)"
+      },
+      {
+        "yAxisID": "db_cpu",
+        "label": "DB CPU",
+        "data": [11, 20, 27, 29, 29, 30, 34, 35, 37, 36, 35, 36, 39, 40, 40, 45, 44, 44, 45, 27],
+        "backgroundColor":"rgba(220,120,120,.8)"
+      }
+    ]
+  },
+  "options":
+  {
+    "scales":
+    {
+      "x":
+      {
+        "title":
+        {
+          "display": "true",
+          "text": "Max Pool Size"
+        }
+      },
+      "rps": 
+      {
+        "type": "linear",
+        "position": "left",
+        "title":
+        {
+          "display": "true",
+          "text": "Requests Per Second"
+        }
+      },
+      "db_cpu":
+      {
+        "type": "linear",
+        "position": "right",
+        "min": 0,
+        "max": 100,
+        "title":
+        {
+          "display": "true",
+          "text": "DB CPU"
+        }
+      }
+    }
+  }
+}
+-->
+		  </canvas>
+        </div>
+
+        <aside class="notes">
+          <ul>
+          	<li>DB CPU never goes over 45%, and is 36% at peak (19 connections).</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section data-markdown>
+        <textarea data-template>
+
+# We've talked about the good...
+
+## ... now let's talk about the bad.
+
+---
+
+## Statelessness
+
+* Cannot do anything that involves connection state...
+* ... especially transactions. <!-- .element: class="fragment" -->
+* Can still exclusively rent out connections, as before. <!-- .element: class="fragment" -->
+
+Notes:
+
+* Other examples: temp tables, session variables...
+
+---
+
+## Head of line blocking
+
+* We get query results from the DB in the same order we sent them, FIFO. <!-- .element: class="fragment" -->
+* Processing the results of a later query can only happen when earlier results were processing. <!-- .element: class="fragment" -->
+* A slow query (or client-side processing!) can block other, unrelated producers. <!-- .element: class="fragment" -->
+
+Note:
+
+* Resultset buffering: but memory.
+
+---
+
+## Some conclusions
+
+* Don't over-parallelize!
+* Stop thinking about connections! We just have database command producers. <!-- .element: class="fragment" -->
+* Multiplexing relies on an in-process (and probably in-driver) pool. <!-- .element: class="fragment" -->
+* Remember: the perf numbers we've seen are TechEmpower benchmarks, massive concurrent load. <!-- .element: class="fragment" -->
+* This is all still a bit experimental! <!-- .element: class="fragment" -->
+
+Notes:
+
+* The in-process comment: .NET is (inadvertently) in a good place
+
+---
+
+## The Npgsql team
+
+A special thanks to <span style="color: red" >Nikita Kazmin</span> and <span style="color: red">Nino Floris</span> for their considerable work on multiplexing, and also to Brar Piening!
+
+---
+
+Thank you!
+
+**Shay Rojansky**
+
+<http://roji.org>, @shayrojansky
+
+<img src="img/postgresql.png" width="120" />
+<img src="img/dotnetbot.png" width="120" />
+        </textarea>
+      </section>
+
+      </div>
+    </div>
+
+    <!-- DbDataSource? -->
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+
+    <script src="plugin/chart/chart.min.js"></script>
+    <script src="plugin/chart/plugin.js"></script>
+
+    <script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+                slideNumber: true,
+
+                chart: {
+					defaults: { 
+						color: 'lightgray', // color of labels
+						scale: { 
+							beginAtZero: true, 
+							ticks: { stepSize: 1 }
+						},
+					},
+					line: { borderColor: [ "rgba(20,220,220,.8)" , "rgba(220,120,120,.8)" ] },
+				},
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealChart ]
+			});
+    </script>
+  </body>
+</html>

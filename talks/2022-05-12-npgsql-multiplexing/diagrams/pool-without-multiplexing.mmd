@@ -1,0 +1,8 @@
+flowchart TB
+  John --> |return| idle_queue
+  Mary --> |return| idle_queue
+  idle_queue --> |rent| John
+  idle_queue --> |rent| Mary
+  subgraph Pool
+    idle_queue>Idle connection queue]
+  end
