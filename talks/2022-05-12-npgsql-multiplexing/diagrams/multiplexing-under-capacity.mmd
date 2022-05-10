@@ -1,0 +1,17 @@
+flowchart LR
+  cmd_queue>Command queue]
+  loop((Write loop))
+  cmd_queue --> loop((Write loop))
+
+  subgraph Connections
+    conn1[/Connection 1 - idle/]
+    conn2[/Connection 2 - idle/]
+    conn3[/Connection 3 - idle/]
+
+    conn4[/Connection 4 - busy/]:::busy
+    classDef busy fill: red;
+  end
+
+  loop --> conn1
+  loop -.-> conn2
+  loop -.-> conn3

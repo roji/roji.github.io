@@ -1,0 +1,10 @@
+sequenceDiagram
+    App-->>Pool: I need a connection
+    Pool-->>App: Here's one for ya
+    App->>DB: Execute this SQL please
+    loop Execution
+        DB->>DB: Working... Working...
+    end
+    DB->>App: Here are your results, sir!
+    App-->>Pool: Don't need this connection any more
+    Pool-->>App: Gotcha, it's back in the pool (and reset)

@@ -1,0 +1,23 @@
+flowchart TB
+  John --> |return| idle_queue
+  idle_queue --> |rent| John
+  Mary --> |submit| cmd_queue
+  Jane --> |submit| cmd_queue
+  subgraph pool [Multiplexing Pool]
+    idle_queue>Idle connection queue]
+    cmd_queue>Command queue]
+    loop((Write loop))
+    idle_queue --> |rent| loop
+    cmd_queue --> loop
+  end
+
+  loop --> jane_cmd
+  loop --> mary_cmd
+
+  subgraph batch [Multiplexing Batch]
+    direction LR
+    jane_cmd[Jane's command]
+    mary_cmd[Mary's command]
+  end
+
+  batch --> db[(Database)]
