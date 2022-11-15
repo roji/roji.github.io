@@ -4,10 +4,13 @@ title: "Talks"
 classes: wide
 ---
 
-Here are some talks I gave:
+I regularly appear on the .NET Data Community Standup every other week; the full session list is available [here](https://www.youtube.com/playlist?list=PLdo4fOcmZ0oX0ObHwBrJ0vJpZ7PiYMqeA).
+
+Other than that, here are some talks I gave:
 
 Date       | Talk Title                                                      | Conference                                   | Presentation | Recording
 ---------- | ----------------------------------------------------------------| -------------------------------------------- | ------------ | ---------
+2022-11-10 | Leveling up data: Upgrade from EF6 to EF7 and blast off!        | [.NET Conf 2022](https://www.dotnetconf.net) |              | [recording](https://youtu.be/1U02rnSaz9Q)
 2022-05-15 | Npgsql Multiplexing: A high-performance database driver model   | [.NET User Group Zürich](https://www.meetup.com/dotnet-zurich/events/285736291) | [slides](2022-05-12-npgsql-multiplexing) | [recording](https://www.youtube.com/watch?v=M2tJLi_MYOw)
 2022-04-20 | Performance Improvements to the EF7 Update Pipeline             | [.NET Community Standup](https://dotnet.microsoft.com/platform/community/standup) | | [recording](https://www.youtube.com/watch?v=EXbuRVqxn2o)
 2021-09-23 | PostgreSQL and EF Core                                          | [.NET Community Standup](https://dotnet.microsoft.com/platform/community/standup) | | [recording](https://www.youtube.com/watch?v=Ya_cmZRwACM&list=PLdo4fOcmZ0oX-DBuRG4u58ZTAJgBAeQ-t&index=7)
