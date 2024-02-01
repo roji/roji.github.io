@@ -10,6 +10,7 @@ Other than that, here are some talks I gave:
 
 Date       | Talk Title                                                      | Conference                                                                        | Presentation                             | Recording
 ---------- | ----------------------------------------------------------------| --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
+2024-01-18 | Update Performance Improvements in Entity Framework Core 7/8    | Warsaw .NET User Group                                                            |                                          |
 2023-11-24 | Update Performance Improvements in Entity Framework Core 7.0    | [Update Conference Prague](https://www.updateconference.net)                      |                                          | 
 2023-11-23 | .NET Data and the NativeAOT Story                               | [Update Conference Prague](https://www.updateconference.net)                      |                                          | 
 2023-11-14 | EF8, document and relational databases, and fun with JSON       | [.NET Conf 2023](https://www.dotnetconf.net)                                      |                                          | [recording](https://youtu.be/_8iH5QnkIJo)
