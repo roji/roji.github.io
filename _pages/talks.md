@@ -10,6 +10,7 @@ Other than that, here are some talks I gave:
 
 Date       | Talk Title                                                      | Conference                                                                        | Presentation                             | Recording
 ---------- | ----------------------------------------------------------------| --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
+2024-02-05 | Cracking the code: A deep dive into data layer optimization.    | Betatalks Podcast                                                                 |                                          | [recording](https://podcast.betatalks.nl/1622272/14420325-75-cracking-the-code-a-deep-dive-into-data-layer-optimization-with-shay-rojansky)
 2024-01-18 | Update Performance Improvements in Entity Framework Core 7/8    | Warsaw .NET User Group                                                            |                                          |
 2023-11-24 | Update Performance Improvements in Entity Framework Core 7.0    | [Update Conference Prague](https://www.updateconference.net)                      |                                          | 
 2023-11-23 | .NET Data and the NativeAOT Story                               | [Update Conference Prague](https://www.updateconference.net)                      |                                          | 
