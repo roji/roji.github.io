@@ -12,7 +12,6 @@ Date       | Talk Title                                                       | 
 ---------- | ----------------------------------------------------------------| --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
 2024-05-08 | EF 8.0, primitive collections and JSON                           | [Techorama Antwerp, 2024](https://techorama.be)
 2024-05-07 | EF and NativeAOT: A deep dive into the heart of a query pipeline | [Techorama Antwerp, 2024](https://techorama.be)
-2024-04-16 | Use EF Core to transition from SQL Server to Azure Cosmos DB     | [Azure Cosmos DB Conf 2024](https://azurecosmosdb.github.io/azurecosmosdbconf/)
 2024-02-05 | Cracking the code: A deep dive into data layer optimization.     | Betatalks Podcast                                                                 |                                          | [recording](https://podcast.betatalks.nl/1622272/14420325-75-cracking-the-code-a-deep-dive-into-data-layer-optimization-with-shay-rojansky)
 2024-01-18 | Update Performance Improvements in Entity Framework Core 7/8     | Warsaw .NET User Group                                                            |                                          |
 2023-11-24 | Update Performance Improvements in Entity Framework Core 7.0     | [Update Conference Prague](https://www.updateconference.net)                      |                                          | 
