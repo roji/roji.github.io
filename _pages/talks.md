@@ -11,6 +11,7 @@ Other than that, here are some talks I gave:
 Date       | Talk Title                                                       | Conference                                                                        | Presentation                             | Recording
 ---------- | ----------------------------------------------------------------| --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
 2024-06-26 | EF and NativeAOT: a deep dive into the LINQ query pipeline.      | [Update Days, .NET Performance](https://performance.updatedays.cz)
+2024-05-21 | EF Core 9: Evolving Data Access in .NET                          | [Build 2024](https://build.microsoft.com/en-US/sessions/4f008f3d-c58a-4806-b6b4-dfb993b32c4f?source=/speakers/fa3388eb-b27c-444d-99bc-a0d1f8c02961)
 2024-05-08 | EF 8.0, primitive collections and JSON                           | [Techorama Antwerp, 2024](https://techorama.be)
 2024-05-07 | EF and NativeAOT: A deep dive into the heart of a query pipeline | [Techorama Antwerp, 2024](https://techorama.be)
 2024-02-05 | Cracking the code: A deep dive into data layer optimization.     | Betatalks Podcast                                                                 |                                          | [recording](https://podcast.betatalks.nl/1622272/14420325-75-cracking-the-code-a-deep-dive-into-data-layer-optimization-with-shay-rojansky)
