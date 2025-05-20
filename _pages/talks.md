@@ -9,9 +9,11 @@ I regularly appear on the .NET Data Community Standup every other week; the full
 Other than that, here are some talks I gave:
 
 Date       | Talk Title                                                       | Conference                                                                        | Presentation                             | Recording
----------- | ----------------------------------------------------------------| --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
+---------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
+2025-05-28 | Translating LINQ to SQL                                          | [Techorama Antwerp, 2025](https://techorama.be)                                   |
+2025-05-27 | Databases, EF, and testing your applications                     | [Techorama Antwerp, 2025](https://techorama.be)                                   |
 2024-10-24 | Test EF Core Applications                                        | .NET @ MS Conference
-2024-10-24 | Next-gen AI apps with databases at scale anywhere                | Microosft AI Tour Berlin 2024
+2024-10-24 | Next-gen AI apps with databases at scale anywhere                | Microsft AI Tour Berlin 2024
 2024-05-21 | EF Core 9: Evolving Data Access in .NET                          | [Build 2024](https://build.microsoft.com/en-US/sessions/4f008f3d-c58a-4806-b6b4-dfb993b32c4f?source=/speakers/fa3388eb-b27c-444d-99bc-a0d1f8c02961)
 2024-05-08 | EF 8.0, primitive collections and JSON                           | [Techorama Antwerp, 2024](https://techorama.be)
 2024-05-07 | EF and NativeAOT: A deep dive into the heart of a query pipeline | [Techorama Antwerp, 2024](https://techorama.be)
