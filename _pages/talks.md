@@ -10,6 +10,7 @@ Other than that, here are some talks I gave:
 
 Date       | Talk Title                                                                           | Conference                                                                        | Presentation                             | Recording
 ---------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ---------------------------------------- | ---------
+2026-02-19 | LINQ vers SQL sans magie (French)                                                    | [DevApps](https://devapps.be/)                  |
 2025-11-14 | Translating LINQ to SQL: caching, nullability and other deep topics                  | [Update Conference Prague](https://prague.updateconference.net/)                  |
 2025-11-14 | Databases, EF, and testing your applications - making sense of all the confusion     | [Update Conference Prague](https://prague.updateconference.net/)                  |                                        |
 2025-11-12 | Translating LINQ to SQL: caching, nullability and other deep topics                  | [Orchard Harvest](https://orchardcore.net)                                        |
